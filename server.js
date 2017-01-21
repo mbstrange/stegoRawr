@@ -1,13 +1,16 @@
 //-------------------------Module "Importing"-----------------------------//
-var express = require('express');
+var express   = require('express');
+var app       = express();
+
 var BinaryServer = require('binaryjs').BinaryServer;
 var fs = require('fs');
 var wav = require('wav');
 var path = require('path'); //Node.js module used for getting path of file
 var logger = require('morgan'); //used to log in console window all request
-var bodyParser = require('body-parser'); //allows the use of req.body in POST request
+var bodyParser = require('body-parser'); //allows the use of req.body in POST requestDebug.Log("test"); 
 
-var app = express(); //creates an instance of express
+var SpotifyWebApi = require('spotify-web-api-node');
+var spotifyApi = new SpotifyWebApi();
 
 
 //-------------------------Globals-----------------------------//
@@ -48,8 +51,10 @@ app.get('/song/:id', function(req, res, next) {
 
 
 //-------------------------HTTP Server Config-----------------------------//
-app.listen(8451); //Port to listen on
-app.on('listening', onListening);
+var server    = app.listen(8451);
+var io        = require('socket.io').listen(server);
+
+server.on('listening', onListening);
 
 function onListening() {
   var addr = server.address();
@@ -59,30 +64,47 @@ function onListening() {
   console.log('Listening on ' + bind);
 }
 
+io.sockets.on('connection', function (client) {
+     console.log("connecting" + client.id);
+    
+    client.on('disconnect', function() { 
+        console.log("disconnect" + client.id);         
+    });
+});
+
 //-------------------------Binary Audio Server-----------------------------//
 binaryServer = BinaryServer({port: 9001});
 
 binaryServer.on('connection', function(client) {
     
-  console.log('new connection from: ' + client.id);
-  
-  var outFile = "audio/" + "sound_" + client.id + ".wav"; 
-    
-  var fileWriter = new wav.FileWriter(outFile, {
-    channels: 1,
-    sampleRate: 44100,
-    bitDepth: 16
-  });
+    console.log('new connection from: ' + client.id);
 
-  client.on('stream', function(stream, meta) {
-    console.log('new stream started for:' + client.id);
-    stream.pipe(fileWriter);
+    var outFile = "audio/" + "sound_" + client.id + ".wav"; 
 
-    stream.on('end', function() {
-      fileWriter.end();
-      console.log('wrote to file ' + outFile);
+    var fileWriter = new wav.FileWriter(outFile, {
+        channels: 1,
+        sampleRate: 44100,
+        bitDepth: 16
     });
-  });
+
+    client.on('stream', function(stream, meta) {
+        console.log('new stream started for:' + client.id);
+        stream.pipe(fileWriter);
+
+        stream.on('end', function() {
+            fileWriter.end();
+            console.log('wrote to file ' + outFile);
+
+            spotifyApi.getTrack('3Qm86XLflmIXVm1wcwkgDK')
+                .then(function(data) {
+                console.log(data.body.external_urls.spotify);                
+                io.emit('api', {"id" : data.body.external_urls.spotify});
+            }, function(err) {
+                done(err);
+            });
 });
+});
+});
+
 
 

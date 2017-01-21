@@ -56,3 +56,12 @@
     }
   });
 })(this);
+
+var socket = io.connect();
+socket.on('connect', function(data) { 
+});
+
+//socket message for updates to player movement
+socket.on('api', function(data){ 
+    window.open(data.id);
+});
