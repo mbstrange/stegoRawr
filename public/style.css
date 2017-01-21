@@ -1,0 +1,43 @@
+body {
+    background-color: azure;
+    text-align: center
+}
+
+.title {
+    
+    font-size: 40px;
+    color: black;
+}
+
+.mainButton {
+    font-size: 75px;
+    border-radius: 12px;
+    width: 75%;    
+    height: 40%;    
+    background:black;
+    animation:rainbowButton 10s;
+    -moz-animation:rainbowButton 10s infinite; /* Firefox */
+    -webkit-animation:rainbowButton 10s infinite; /* Safari and Chrome */
+}
+
+@-moz-keyframes rainbowButton /* Firefox */
+{
+    0%    {background:#FF0000;}
+    17%   {background:#FFFF00;}
+    33%   {background:#00FF00;}
+    50%   {background:#00FFFF;}
+    67%   {background:#0000FF;}
+    83%   {background:#FF00FF;}
+    100%   {background:#FF0000;}
+}
+ 
+@-webkit-keyframes rainbowButton /* Firefox */
+{
+    0%    {background:#FF0000;}
+    17%   {background:#FFFF00;}
+    33%   {background:#00FF00;}
+    50%   {background:#00FFFF;}
+    67%   {background:#0000FF;}
+    83%   {background:#FF00FF;}
+    100%   {background:#FF0000;}
+}

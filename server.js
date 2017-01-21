@@ -14,15 +14,13 @@ var extend = require('util')._extend; //used to make copy of objects -> extend({
 var localIP = require("ip").address(); //used to know where to check for web view site
 console.log("Local IP: " + localIP);
 
-var defaultPlayer = require('./setup/defaultPlayer'); //used as template for first time login
-
 var debugMode = false;
 //-------------------------getting funtions/routes from other files-----------------------------//
 //api to mongoose calls
 var api = require('./routes/api');
 
 //-------------------------Sets up MongoDB Connection-----------------------------//
-var mongoURI = "mongodb://127.0.0.1:27017/EggPlant"; //localhost:defaultPort/dataBase
+/*var mongoURI = "mongodb://127.0.0.1:27017/EggPlant"; //localhost:defaultPort/dataBase
 
 //sets up Mongoose
 var mongoose = require('mongoose'); //added for Mongo support
@@ -31,7 +29,7 @@ MongooseDB.on('error', function(err) { console.log(err.message); console.log("Is
 MongooseDB.once('open', function() {
   console.log("mongooseDB connection open");
 });
-      
+      */
 //-------------------------Node Setup-----------------------------//
 //Loops through starting after "node server.js" and checks the arguments
 for (var i = 2; i < process.argv.length; i++) {
@@ -56,8 +54,10 @@ app.use(express.static(path.join(__dirname, 'public'))); //sets all static file 
 //-------------------------ROUTES-----------------------------//
 app.use('/api', api); //sets the API used to access the Database
 
-//device from 192.168.1.200 should be:
-// /play/200
+app.get('/', function(req, res, next) {
+   res.sendFile(path.join(__dirname, '../public', 'index.html'));
+});
+
 app.get('/song/:id', function(req, res, next) {    
     console.dir(req.body);
     res.send("todo");
